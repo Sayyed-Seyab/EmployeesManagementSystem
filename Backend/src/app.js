@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://employees-management-system-w71u.vercel.app",
+  "https://employees-management-system-7oll-8hcfzf7pf.vercel.app/",
 ];
 
 app.use(
