@@ -2,10 +2,29 @@ import express from 'express';
 import cors from 'cors';
 import EmployeeRouter from './routes/employeeRoutes.js';
 
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://employees-management-system-w71u.vercel.app",
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ success: true, message: 'API is running' });
