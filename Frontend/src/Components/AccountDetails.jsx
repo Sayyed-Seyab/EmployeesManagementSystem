@@ -67,7 +67,7 @@ export default function AccountDetails() {
 
   try {
     await axios.post(
-      "http://localhost:5000/api/employees/account",
+      "https://employeesmanagementsystem-1.onrender.com/api/employees/account",
       payload
     );
 

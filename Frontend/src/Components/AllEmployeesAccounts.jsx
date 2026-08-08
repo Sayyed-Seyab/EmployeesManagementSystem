@@ -42,7 +42,7 @@ export default function AllEmployeesAccounts() {
       setLoading(true);
 
       const { data } = await axios.get(
-        "http://localhost:5000/api/employees/accounts"
+        "https://employeesmanagementsystem-1.onrender.com/api/employees/accounts"
       );
 
       if (data.success) {

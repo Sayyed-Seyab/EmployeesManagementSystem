@@ -13,7 +13,7 @@ export default function AllEmployeesData() {
       setLoading(true);
 
       const { data } = await axios.get(
-        "http://localhost:5000/api/employees"
+        "https://employeesmanagementsystem-1.onrender.com/api/employees"
       );
 
       if (data.success) {
