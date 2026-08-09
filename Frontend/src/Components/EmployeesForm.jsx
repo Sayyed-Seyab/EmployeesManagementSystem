@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 function EmployeesForm() {
+  const [Employeeloading, setEmployeeLoading] = useState(false)
   const initialData = {
     fullName: "",
     mis:"",
@@ -49,12 +50,14 @@ function EmployeesForm() {
     }
 
     try {
+      setEmployeeLoading(true);
       const response = await axios.post(
     "https://employeesmanagementsystem-1.onrender.com/api/employees",
     formData
   );
 
   if (response.data.success) {
+    setEmployeeLoading(false);
     toast.success(response.data.message);
 
     console.log(response.data.message);
@@ -66,6 +69,8 @@ function EmployeesForm() {
       
     } catch (error) {
    toast.error(error.response?.data?.message || "Something went wrong.");
+    } finally{
+      setEmployeeLoading(false);
     }
   };
 
@@ -148,12 +153,24 @@ function EmployeesForm() {
             options={["Non","Matric","Intermediate","Graduate","Master"]} />
 
           <div className="md:col-span-2">
-            <button
-              type="submit"
-              className="mt-5 px-8 py-3 rounded-lg bg-green-700 hover:bg-green-800 text-white font-semibold"
-            >
-              Save Employee
-            </button>
+           <button
+  type="submit"
+  disabled={loading}
+  className={`w-full py-3 rounded-lg font-semibold text-white transition duration-300 ${
+    loading
+      ? "bg-green-400 cursor-not-allowed"
+      : "bg-green-700 hover:bg-green-800"
+  }`}
+>
+  {loading ? (
+    <span className="flex items-center justify-center gap-2">
+      <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+      Saving...
+    </span>
+  ) : (
+    "Save Employee"
+  )}
+</button>
           </div>
         </form>
       </div>
