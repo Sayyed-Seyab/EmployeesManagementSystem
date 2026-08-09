@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { toast } from "react-toastify";
 
 export default function AllEmployeesData() {
   const [employees, setEmployees] = useState([]);
@@ -80,6 +81,49 @@ export default function AllEmployeesData() {
   saveAs(fileData, "Employees_Data_Jeddah.xlsx");
 };
 
+
+const handleDelete = async (id) => {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this employee?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    const response = await axios.delete(
+      `https://employeesmanagementsystem-1.onrender.com/api/employees/${id}`
+    );
+
+    console.log("DELETE RESPONSE:", response);
+    console.log("STATUS:", response.status);
+    console.log("DATA:", response.data);
+
+    if (response.status === 200) {
+      // Remove deleted employee from UI
+      setEmployees((prevEmployees) =>
+        prevEmployees.filter(
+          (employee) => employee._id !== id
+        )
+      );
+
+      // Show toast
+      toast.success(
+        response.data?.message ||
+        "Employee deleted successfully."
+      );
+    }
+
+  } catch (error) {
+    console.log("DELETE ERROR:", error);
+    console.log("ERROR RESPONSE:", error.response);
+
+    toast.error(
+      error.response?.data?.message ||
+      "Failed to delete employee."
+    );
+  }
+};
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen text-2xl font-bold">
@@ -137,7 +181,8 @@ export default function AllEmployeesData() {
           <th className="px-4 py-3">Transport</th>
           <th className="px-4 py-3">Allowance</th>
           <th className="px-4 py-3">Total Package</th>
-          <th className="px-4 py-3 rounded-tr-xl">Education</th>
+          <th className="px-4 py-3 ">Education</th>
+          <th className="px-4 py-3 rounded-tr-xl">Actions</th>
 
         </tr>
 
@@ -237,6 +282,15 @@ export default function AllEmployeesData() {
                   {employee.education}
                 </span>
               </td>
+
+               <td className="px-4 py-3 text-center">
+                   <button 
+                   type="button"
+                    onClick={() => handleDelete(employee._id)}
+                     className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition duration-300" > 
+                     Delete
+                      </button>
+                      </td>
 
             </tr>
 

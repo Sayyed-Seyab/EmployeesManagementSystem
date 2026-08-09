@@ -58,6 +58,40 @@ export default function AllEmployeesAccounts() {
     }
   };
 
+  const handleDelete = async (id) => {
+   const confirmDelete = window.confirm(
+    "Are you sure you want to delete this employee?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    const response = await axios.delete(
+      `https://employeesmanagementsystem-1.onrender.com/api/employees/account/${id}`
+    );
+
+    
+
+    if(response.status == 200){
+       toast.success("Account deleted successfully.");
+      // Remove deleted account from UI
+    setAccounts((prevAccounts) =>
+      prevAccounts.filter((account) => account._id !== id)
+    );
+    
+    }
+   
+
+  } catch (error) {
+    console.log(error);
+
+    toast.error(
+      error.response?.data?.message ||
+      "Failed to delete account."
+    );
+  }
+};
+
   useEffect(() => {
     fetchAccounts();
   }, []);
@@ -102,7 +136,10 @@ export default function AllEmployeesAccounts() {
             <th className="px-4 py-3">Account Holder Name</th>
             <th className="px-4 py-3">Bank Name</th>
              <th className="px-4 py-3">Contact Number</th>
-            <th className="px-4 py-3 rounded-tr-xl">Created At</th>
+            <th className="px-4 py-3 ">Created At</th>
+            <th className="px-4 py-3 text-center rounded-tr-xl">
+  Action
+</th>
           </tr>
         </thead>
 
@@ -140,6 +177,14 @@ export default function AllEmployeesAccounts() {
                 <td className="px-4 py-3 text-center">
                   {new Date(account.createdAt).toLocaleDateString("en-GB")}
                 </td>
+                <td className="px-4 py-3 text-center">
+                   <button 
+                   type="button"
+                    onClick={() => handleDelete(account._id)}
+                     className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition duration-300" > 
+                     Delete
+                      </button>
+                      </td>
               </tr>
             ))
           ) : (

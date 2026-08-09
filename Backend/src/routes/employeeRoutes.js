@@ -7,12 +7,14 @@ import {
   deleteEmployee,
   createAccount,
   getAllAccounts,
+  dltAccount,
 } from '../controllers/employeeController.js';
 
 const EmployeeRouter = express.Router();
 
 EmployeeRouter.post('/account', createAccount);
 EmployeeRouter.get('/accounts', getAllAccounts);
+EmployeeRouter.delete('/account/:id', dltAccount);
 EmployeeRouter.get('/', getEmployees);
 EmployeeRouter.post('/', createEmployee);
 EmployeeRouter.get('/:id', getEmployeeById);

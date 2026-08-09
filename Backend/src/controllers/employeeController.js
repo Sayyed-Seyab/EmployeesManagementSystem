@@ -176,6 +176,22 @@ export const deleteEmployee = async (req, res) => {
 };
 
 
+export const dltAccount = async (req, res) => {
+  try {
+    const Account = await AccountSchema.findByIdAndDelete(req.params.id);
+
+    if (!Account) {
+      return res.status(404).json({ success: false, message: 'Account not found' });
+    }
+
+    res.status(200).json({ success: true, message: 'Account deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+
 export const createAccount = async (req, res) => {
   try {
     const {
