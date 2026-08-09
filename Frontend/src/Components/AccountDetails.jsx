@@ -280,7 +280,7 @@ console.log(response)
   <option value="">Select Work Location</option>
   <option value="Riyadh">Riyadh</option>
   <option value="Jeddah">Jeddah</option>
-    <option value="Jeddah">China Harbor
+    <option value="China Harbor">China Harbor
     </option>
 </select>
 </div>
