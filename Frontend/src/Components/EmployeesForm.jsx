@@ -1,9 +1,15 @@
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useEffect } from "react";
 
 function EmployeesForm() {
   const [Employeeloading, setEmployeeLoading] = useState(false)
+  // Store submitted data for modal
+   const [submittedData, setSubmittedData] = useState(null);
+    // Modal state
+     const [showModal, setShowModal] = useState(false);
+
   const initialData = {
     fullName: "",
     mis:"",
@@ -33,49 +39,477 @@ function EmployeesForm() {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log(formData)
 
-    if (!/^[A-Za-z ]+$/.test(formData.fullName.trim())) {
-      return alert("Full Name should contain letters only.");
-    }
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (Number(formData.iqamaNo) < 0) {
-      return alert("Iqama Number must be greater than zero.");
-    }
+  console.log("FORM DATA:", formData);
 
-    if (!/^\d{10}$/.test(formData.absherMobile)) {
-      return alert("Absher Mobile Number must contain exactly 10 digits.");
-    }
+  // ==========================================
+  // FULL NAME
+  // ==========================================
 
-    try {
-      setEmployeeLoading(true);
-      const response = await axios.post(
-    "https://employeesmanagementsystem-1.onrender.com/api/employees",
-    formData
-  );
-
-  if (response.data.success) {
-    setEmployeeLoading(false);
-    toast.success(response.data.message);
-
-    console.log(response.data.message);
-
-    setFormData(initialData);
+  if (!formData.fullName.trim()) {
+    return toast.error("Full Name is required.");
   }
 
-  console.log(response);
-      
-    } catch (error) {
-   toast.error(error.response?.data?.message || "Something went wrong.");
-    } finally{
-      setEmployeeLoading(false);
-    }
-  };
+  if (!/^[A-Za-z ]+$/.test(formData.fullName.trim())) {
+    return toast.error("Full Name should contain letters only.");
+  }
 
+
+  // ==========================================
+  // IQAMA NUMBER
+  // ==========================================
+
+  if (!formData.iqamaNo.trim()) {
+    return toast.error("Iqama Number is required.");
+  }
+
+  // Numbers only
+  if (!/^\d+$/.test(formData.iqamaNo)) {
+    return toast.error("Iqama Number must contain numbers only.");
+  }
+
+  // Exactly 10 digits
+  if (!/^\d{10}$/.test(formData.iqamaNo)) {
+    return toast.error("Iqama Number must be exactly 10 digits.");
+  }
+
+
+  // ==========================================
+  // DATE OF BIRTH
+  // EMPLOYEE MUST BE AT LEAST 18 YEARS OLD
+  // ==========================================
+
+  if (!formData.dateOfBirth) {
+    return toast.error("Date of Birth is required.");
+  }
+
+  const today = new Date();
+
+  const birthDate = new Date(formData.dateOfBirth);
+
+  // Calculate age
+  let age =
+    today.getFullYear() -
+    birthDate.getFullYear();
+
+  const monthDifference =
+    today.getMonth() -
+    birthDate.getMonth();
+
+  // If birthday has not occurred yet this year
+  if (
+    monthDifference < 0 ||
+    (
+      monthDifference === 0 &&
+      today.getDate() < birthDate.getDate()
+    )
+  ) {
+    age--;
+  }
+
+  // Must be 18 or older
+  if (age < 18) {
+    return toast.error(
+      "Employee must be at least 18 years old."
+    );
+  }
+
+
+  // ==========================================
+  // JOINING DATE
+  // MUST NOT BE FUTURE DATE
+  // ==========================================
+
+  if (!formData.joiningDate) {
+    return toast.error("Joining Date is required.");
+  }
+
+  const joiningDate = new Date(formData.joiningDate);
+
+  // Remove time from today's date
+  const currentDate = new Date();
+
+  currentDate.setHours(0, 0, 0, 0);
+  joiningDate.setHours(0, 0, 0, 0);
+
+  // Joining date cannot be tomorrow or future
+  if (joiningDate > currentDate) {
+    return toast.error(
+      "Joining Date cannot be a future date."
+    );
+  }
+
+
+  // ==========================================
+  // ABSHER MOBILE
+  // ==========================================
+
+  if (!formData.absherMobile.trim()) {
+    return toast.error("Absher Mobile Number is required.");
+  }
+
+  if (!/^\d{10}$/.test(formData.absherMobile)) {
+    return toast.error(
+      "Absher Mobile Number must contain exactly 10 digits."
+    );
+  }
+
+
+  // ==========================================
+  // ACCOUNT NUMBER
+  // ==========================================
+const accountNumber = ""
+  if (formData.bankIban !== "") {
+    return toast.error("Account Number is required.");
+      
+    // Remove spaces if the user entered them
+   accountNumber = formData.bankIban.replace(/\s/g, "");
+console.log(accountNumber.length);
+  // Numbers only
+  if (!/^\d+$/.test(accountNumber)) {
+    return toast.error(
+      "Account Number must contain numbers only."
+    );
+  }
+
+
+  // Exactly 22 digits
+  if (accountNumber.length !== 22) {
+    return toast.error(
+      "Account Number must be exactly 22 digits."
+    );
+  }
+  }
+
+
+  
+
+
+  // ==========================================
+  // API REQUEST
+  // ==========================================
+
+  try {
+    setEmployeeLoading(true);
+
+    // Use cleaned account number
+    const payload = {
+      ...formData,
+      bankIban: accountNumber,
+    };
+
+    console.log("PAYLOAD:", payload);
+
+    const response = await axios.post(
+      "https://employeesmanagementsystem-1.onrender.com/api/employees",
+      payload
+    );
+
+    console.log("API RESPONSE:", response.data);
+
+    if (response.status === 201) {
+
+      // Save submitted data BEFORE clearing form
+      setSubmittedData(payload);
+
+      // Show success modal
+      setShowModal(true);
+
+      // Clear form
+      setFormData(initialData);
+
+      toast.success(
+        response.data.message ||
+        "Employee saved successfully."
+      );
+    }
+
+  } catch (error) {
+
+    console.log("FULL ERROR:", error);
+    console.log(
+      "STATUS:",
+      error.response?.status
+    );
+    console.log(
+      "DATA:",
+      error.response?.data
+    );
+
+    toast.error(
+      error.response?.data?.message ||
+      "Something went wrong."
+    );
+
+  } finally {
+    setEmployeeLoading(false);
+  }
+};
+
+
+  useEffect(()=>{
+    console.log(formData);
+  },[formData])
   return (
     <div className="min-h-screen bg-gray-100 py-6 px-3 sm:px-6">
+     
+{/* ================= SUCCESS MODAL ================= */}
+
+{showModal && submittedData && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6">
+
+    <div className="bg-white w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl">
+
+      {/* ================= MODAL HEADER ================= */}
+      <div className="border-b px-6 py-5 sticky top-0 bg-white z-10">
+        <h2 className="text-2xl font-bold text-green-700">
+          Employee Saved Successfully
+        </h2>
+
+        <p className="text-gray-500 text-sm mt-1">
+          Submitted employee details
+        </p>
+      </div>
+
+
+      {/* ================= MODAL BODY ================= */}
+      <div className="px-6 py-6">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
+
+          {/* Full Name */}
+          <div>
+            <p className="text-sm text-gray-500">
+              Full Name
+            </p>
+
+            <p className="font-semibold text-gray-900 mt-1">
+              {submittedData.fullName || "-"}
+            </p>
+          </div>
+
+
+          {/* MIS */}
+          <div>
+            <p className="text-sm text-gray-500">
+              MIS
+            </p>
+
+            <p className="font-semibold text-gray-900 mt-1">
+              {submittedData.mis || "-"}
+            </p>
+          </div>
+
+
+          {/* Iqama Number */}
+          <div>
+            <p className="text-sm text-gray-500">
+              Iqama Number
+            </p>
+
+            <p className="font-semibold text-gray-900 mt-1">
+              {submittedData.iqamaNo || "-"}
+            </p>
+          </div>
+
+
+          {/* Date of Birth */}
+          <div>
+            <p className="text-sm text-gray-500">
+              Date of Birth
+            </p>
+
+            <p className="font-semibold text-gray-900 mt-1">
+              {submittedData.dateOfBirth || "-"}
+            </p>
+          </div>
+
+
+          {/* Joining Date */}
+          <div>
+            <p className="text-sm text-gray-500">
+              Joining Date
+            </p>
+
+            <p className="font-semibold text-gray-900 mt-1">
+              {submittedData.joiningDate || "-"}
+            </p>
+          </div>
+
+
+          {/* Nationality */}
+          <div>
+            <p className="text-sm text-gray-500">
+              Nationality
+            </p>
+
+            <p className="font-semibold text-gray-900 mt-1">
+              {submittedData.nationality || "-"}
+            </p>
+          </div>
+
+
+          {/* Profession */}
+          <div>
+            <p className="text-sm text-gray-500">
+              Profession
+            </p>
+
+            <p className="font-semibold text-gray-900 mt-1">
+              {submittedData.profession || "-"}
+            </p>
+          </div>
+
+
+          {/* Work Location */}
+          <div>
+            <p className="text-sm text-gray-500">
+              Work Location
+            </p>
+
+            <p className="font-semibold text-gray-900 mt-1">
+              {submittedData.workLocation || "-"}
+            </p>
+          </div>
+
+
+          {/* Bank Name */}
+          <div>
+            <p className="text-sm text-gray-500">
+              Bank Name
+            </p>
+
+            <p className="font-semibold text-gray-900 mt-1">
+              {submittedData.bankName || "-"}
+            </p>
+          </div>
+
+
+          {/* Bank IBAN */}
+          <div>
+            <p className="text-sm text-gray-500">
+              Bank IBAN
+            </p>
+
+            <p className="font-semibold text-gray-900 mt-1 break-all">
+              {submittedData.bankIban || "-"}
+            </p>
+          </div>
+
+
+          {/* Account Holder Name */}
+          <div>
+            <p className="text-sm text-gray-500">
+              Account Holder Name
+            </p>
+
+            <p className="font-semibold text-gray-900 mt-1">
+              {submittedData.AccountHolderName || "-"}
+            </p>
+          </div>
+
+
+          {/* Personal Email */}
+          <div>
+            <p className="text-sm text-gray-500">
+              Personal Email
+            </p>
+
+            <p className="font-semibold text-gray-900 mt-1 break-all">
+              {submittedData.personalEmail || "-"}
+            </p>
+          </div>
+
+
+          {/* Absher Mobile */}
+          <div>
+            <p className="text-sm text-gray-500">
+              Absher Mobile
+            </p>
+
+            <p className="font-semibold text-gray-900 mt-1">
+              {submittedData.absherMobile || "-"}
+            </p>
+          </div>
+
+
+          {/* Basic Salary */}
+          <div>
+            <p className="text-sm text-gray-500">
+              Basic Salary
+            </p>
+
+            <p className="font-semibold text-gray-900 mt-1">
+              {submittedData.basicSalary || "-"}
+            </p>
+          </div>
+
+
+          {/* Accommodation / Transportation */}
+          <div>
+            <p className="text-sm text-gray-500">
+              Accommodation / Transportation
+            </p>
+
+            <p className="font-semibold text-gray-900 mt-1">
+              {submittedData.accommodationTransportation || "-"}
+            </p>
+          </div>
+
+
+          {/* Total Package */}
+          <div>
+            <p className="text-sm text-gray-500">
+              Total Package
+            </p>
+
+            <p className="font-semibold text-gray-900 mt-1">
+              {submittedData.totalPackage || "-"}
+            </p>
+          </div>
+
+
+          {/* Education */}
+          <div>
+            <p className="text-sm text-gray-500">
+              Education
+            </p>
+
+            <p className="font-semibold text-gray-900 mt-1">
+              {submittedData.education || "-"}
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* ================= MODAL FOOTER ================= */}
+      <div className="border-t px-6 py-4 flex justify-end sticky bottom-0 bg-white">
+
+        <button
+          type="button"
+          onClick={() => {
+            setShowModal(false);
+            setSubmittedData(null);
+          }}
+          className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold transition"
+        >
+          Close
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
+```
+
       <div className="mx-auto max-w-6xl rounded-xl bg-white shadow-xl">
         <div className="rounded-t-xl bg-green-600 p-5">
           <h1 className="text-center text-2xl font-bold text-white sm:text-3xl">
@@ -155,14 +589,14 @@ function EmployeesForm() {
           <div className="md:col-span-2">
            <button
   type="submit"
-  disabled={loading}
+  disabled={Employeeloading}
   className={`w-full py-3 rounded-lg font-semibold text-white transition duration-300 ${
-    loading
+    Employeeloading
       ? "bg-green-400 cursor-not-allowed"
       : "bg-green-700 hover:bg-green-800"
   }`}
 >
-  {loading ? (
+  {Employeeloading ? (
     <span className="flex items-center justify-center gap-2">
       <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
       Saving...

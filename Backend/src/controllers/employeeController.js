@@ -42,8 +42,7 @@ export const createEmployee = async (req, res) => {
       personalEmail,
       absherMobile,
       basicSalary,
-      housing,
-      transportation,
+      accommodationTransportation,
       otherAllowances,
       totalPackage,
       education,
@@ -114,6 +113,7 @@ export const updateEmployee = async (req, res) => {
       transportation,
       otherAllowances,
       totalPackage,
+      accommodationTransportation,
       education,
     } = req.body;
 
@@ -131,8 +131,7 @@ export const updateEmployee = async (req, res) => {
         personalEmail,
         absherMobile,
         basicSalary,
-        housing,
-        transportation,
+        accommodationTransportation,
         otherAllowances,
         totalPackage,
         education,

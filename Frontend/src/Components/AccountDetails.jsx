@@ -173,7 +173,7 @@ console.log(response)
                                  type="button" 
                                  onClick={() => { setShowModal(false); setSubmittedData(null); }}
                                   className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold transition" >
-                                     Submit </button> 
+                                     Close </button> 
                                      </div> 
                                      </div> 
                                      </div>
