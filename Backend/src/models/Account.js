@@ -23,9 +23,13 @@ const Account = new mongoose.Schema(
       required: [true, 'Contact No is required'],
        unique: true,
     },
+      BankName: {
+      type: String,
+      required: [true, 'Bank Name is required'],
+    },
      workLocation: {
       type: String,
-      required: [true, 'Wrok Location is required'],
+      required: [true, 'Work Location is required'],
     },
    
   },

@@ -12,8 +12,9 @@ export default function AllEmployeesAccounts() {
       "S.No": index + 1,
       "Work Location": accounts.workLocation,
       "MIS": accounts.mis,
-      "Account NO": accounts.AccountNo,
-      "Account Holder Name": accounts.AccountHolderName,
+      "IBN": accounts.AccountNo,
+      "Beneficiary": accounts.AccountHolderName,
+      "Bank:": accounts.BankName,
       "Contact No": accounts.ContactNO,
       
     
@@ -99,7 +100,8 @@ export default function AllEmployeesAccounts() {
             <th className="px-4 py-3">MIS</th>
             <th className="px-4 py-3">Account Number</th>
             <th className="px-4 py-3">Account Holder Name</th>
-            <th className="px-4 py-3">Contact Number</th>
+            <th className="px-4 py-3">Bank Name</th>
+             <th className="px-4 py-3">Contact Number</th>
             <th className="px-4 py-3 rounded-tr-xl">Created At</th>
           </tr>
         </thead>
@@ -126,6 +128,9 @@ export default function AllEmployeesAccounts() {
 
                 <td className="px-4 py-3 text-center">
                   {account.AccountHolderName}
+                </td>
+                 <td className="px-4 py-3 text-center">
+                  {account.BankName}
                 </td>
 
                 <td className="px-4 py-3 text-center">

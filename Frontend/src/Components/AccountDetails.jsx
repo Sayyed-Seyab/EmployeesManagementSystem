@@ -8,9 +8,14 @@ export default function AccountDetails() {
     AccountNo: "",
     AccountHolderName: "",
     ContactNO: "",
+    BankName: "",
     workLocation:"",
   });
-
+// Store submitted data for modal
+ const [submittedData, setSubmittedData] = useState(null);
+ 
+ // Modal state
+  const [showModal, setShowModal] = useState(false);
   // Handle Input Change
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -59,6 +64,16 @@ export default function AccountDetails() {
   if (!formData.ContactNO.trim())
     return toast.error("Contact Number is required.");
 
+   // Contact Number
+  if (!formData.workLocation.trim())
+    return toast.error("Work Location is required.");
+
+
+   // Contact Number
+  if (!formData.BankName.trim())
+    return toast.error("Bank Name is required.");
+
+
   // Saudi Mobile Number (05XXXXXXXX)
   if (!/^05\d{8}$/.test(formData.ContactNO))
     return toast.error(
@@ -66,20 +81,30 @@ export default function AccountDetails() {
     );
 
   try {
-    await axios.post(
+   const response =  await axios.post(
       "https://employeesmanagementsystem-1.onrender.com/api/employees/account",
       payload
     );
+console.log(response)
+    if(response.status === 201) {
+       toast.success("Account saved successfully.");
 
-    toast.success("Account saved successfully.");
-
-    setFormData({
+      // Save submitted data for modal 
+      setSubmittedData(payload);
+       // Show success modal 
+       setShowModal(true);
+       setFormData({
       mis: "",
       AccountNo: "",
       AccountHolderName: "",
       ContactNO: "",
       workLocation:"",
+      BankName:"",
     });
+    }
+
+   
+    
 
   } catch (error) {
     toast.error(
@@ -91,6 +116,45 @@ export default function AccountDetails() {
 
   return (
     <div className="flex justify-center mt-8">
+    {/* ================= SUCCESS MODAL ================= */}
+     {showModal && submittedData && (
+       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"> 
+       <div className="bg-white w-full max-w-lg rounded-xl shadow-2xl"> {/* Modal Header */} 
+        <div className="border-b px-6 py-4"> 
+          <h2 className="text-xl font-bold text-green-700"> Account Saved Successfully </h2>
+           <p className="text-gray-500 text-sm mt-1"> Submitted employee account details </p>
+            </div> {/* Modal Body */} <div className="px-6 py-5 space-y-4"> {/* MIS */} 
+              <div className="flex justify-between border-b pb-3"> 
+                <span className="font-medium text-gray-600"> MIS </span> 
+                <span className="font-semibold text-gray-900"> {submittedData.mis} </span> 
+                </div> {/* Account Number */}
+                 <div className="flex justify-between border-b pb-3">
+                   <span className="font-medium text-gray-600"> Account Number </span> 
+                   <span className="font-semibold text-gray-900 break-all text-right"> {submittedData.AccountNo} </span>
+                    </div> {/* Account Holder */} 
+                    <div className="flex justify-between border-b pb-3">
+                       <span className="font-medium text-gray-600"> Account Holder Name </span>
+                        <span className="font-semibold text-gray-900"> {submittedData.AccountHolderName} </span> 
+                        </div> {/* Contact Number */} <div className="flex justify-between border-b pb-3"> 
+                          <span className="font-medium text-gray-600"> Contact Number </span>
+                           <span className="font-semibold text-gray-900"> {submittedData.ContactNO} </span> 
+                           </div> {/* Work Location */} <div className="flex justify-between"> 
+                            <span className="font-medium text-gray-600"> Work Location </span> 
+                            <span className="font-semibold text-gray-900"> {submittedData.workLocation} </span>
+                            <span className="font-medium text-gray-600"> Bank Name </span> 
+                            <span className="font-semibold text-gray-900"> {submittedData.BankName} </span>
+                             </div> 
+                             </div> {/* Modal Footer */}
+                              <div className="border-t px-6 py-4 flex justify-end"> 
+                                <button
+                                 type="button" 
+                                 onClick={() => { setShowModal(false); setSubmittedData(null); }}
+                                  className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold transition" >
+                                     Submit </button> 
+                                     </div> 
+                                     </div> 
+                                     </div>
+                                     )}
       <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-2xl">
         <h2 className="text-2xl font-bold text-center mb-6 text-green-700">
           Salary Account Details
@@ -145,6 +209,7 @@ export default function AccountDetails() {
 
             <input
               type="text"
+              required = {true}
               name="AccountHolderName"
               value={formData.AccountHolderName}
               onChange={handleChange}
@@ -162,6 +227,7 @@ export default function AccountDetails() {
             <input
               type="text"
               name="ContactNO"
+               required = {true}
               value={formData.ContactNO}
               onChange={handleChange}
               placeholder="05XXXXXXXX"
@@ -191,6 +257,35 @@ export default function AccountDetails() {
   <option value="">Select Work Location</option>
   <option value="Riyadh">Riyadh</option>
   <option value="Jeddah">Jeddah</option>
+</select>
+</div>
+
+<div>
+  <label className="block mb-2 font-medium">
+    Bank Name
+  </label>
+
+  <select
+  name="BankName"
+  value={formData.BankName}
+  onChange={handleChange}
+  className="w-full border rounded-lg px-4 py-3 bg-white outline-none transition duration-300 hover:bg-green-100 focus:ring-2 focus:ring-green-500"
+>
+  <option value="">Select Bank Name</option>
+  <option value="Riyadh">Al-Rajhi</option>
+  <option value="Jeddah">AlBilad Bank</option>
+  <option value="Jeddah">Allnma Bank </option>
+  <option value="Jeddah">Arab National Bank</option>
+  <option value="Jeddah">Bank AlJazira</option>
+  <option value="Jeddah">Banque Saudi Fransi</option>
+  <option value="Jeddah">Emirates Bank</option>
+  <option value="Jeddah">Gulf International Bank</option>
+  <option value="Jeddah">Riyadh Bank</option>
+  <option value="Jeddah">STC Bank</option>
+  <option value="Jeddah">Saudi Awwal Bank</option>
+ 
+
+
 </select>
 </div>
 
