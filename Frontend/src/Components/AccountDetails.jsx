@@ -17,6 +17,8 @@ export default function AccountDetails() {
  
  // Modal state
   const [showModal, setShowModal] = useState(false);
+  //loader
+  const [loading, setLoading] = useState(false);
   // Handle Input Change
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -87,12 +89,14 @@ export default function AccountDetails() {
   
 
   try {
+     setLoading(true);
    const response =  await axios.post(
       "https://employeesmanagementsystem-1.onrender.com/api/employees/account",
       payload
     );
 console.log(response)
     if(response.status === 201) {
+      setLoading(false);
        toast.success("Account saved successfully.");
 
       // Save submitted data for modal 
@@ -306,13 +310,25 @@ console.log(response)
 </select>
 </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full bg-green-700 hover:bg-green-800 text-white py-3 rounded-lg font-semibold transition duration-300"
-          >
-            Save Account
-          </button>
+         {/* Submit Button */}
+<button
+  type="submit"
+  disabled={loading}
+  className={`w-full py-3 rounded-lg font-semibold text-white transition duration-300 ${
+    loading
+      ? "bg-green-400 cursor-not-allowed"
+      : "bg-green-700 hover:bg-green-800"
+  }`}
+>
+  {loading ? (
+    <span className="flex items-center justify-center gap-2">
+      <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+      Saving...
+    </span>
+  ) : (
+    "Save Account"
+  )}
+</button>
 
         </form>
       </div>
