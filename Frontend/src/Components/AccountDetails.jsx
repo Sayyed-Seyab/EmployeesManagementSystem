@@ -121,7 +121,9 @@ console.log(response)
       error.response?.data?.message || "Something went wrong."
     );
     console.log(error);
-  }
+  }finally {
+  setLoading(false);
+}
 };
 
   return (
