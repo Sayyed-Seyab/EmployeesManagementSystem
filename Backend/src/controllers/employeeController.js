@@ -185,10 +185,11 @@ export const createAccount = async (req, res) => {
       AccountHolderName,
       ContactNO,
       workLocation,
+      BankName,
     } = req.body;
 
     // Validation
-    if (!mis || !AccountNo || !AccountHolderName || !ContactNO || !workLocation) {
+    if (!mis || !AccountNo || !AccountHolderName || !ContactNO || !workLocation || !BankName) {
       return res.status(400).json({
         success: false,
         message: "All fields are required.",
@@ -225,6 +226,7 @@ export const createAccount = async (req, res) => {
       AccountNo,
       AccountHolderName,
       ContactNO,
+      BankName,
       workLocation,
     });
 

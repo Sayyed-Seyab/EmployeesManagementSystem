@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
+import { useEffect } from "react";
 import { toast } from "react-toastify";
 
 export default function AccountDetails() {
@@ -8,8 +9,8 @@ export default function AccountDetails() {
     AccountNo: "",
     AccountHolderName: "",
     ContactNO: "",
-    BankName: "",
     workLocation:"",
+      BankName: "",
   });
 // Store submitted data for modal
  const [submittedData, setSubmittedData] = useState(null);
@@ -25,6 +26,10 @@ export default function AccountDetails() {
       [name]: value,
     }));
   };
+
+  useEffect(()=>{
+    console.log(formData)
+  },[formData])
 
   // Submit Form
   const handleSubmit = async (e) => {
@@ -79,6 +84,7 @@ export default function AccountDetails() {
     return toast.error(
       "Enter a valid Saudi mobile number (e.g. 05XXXXXXXX)."
     );
+  
 
   try {
    const response =  await axios.post(
@@ -120,32 +126,43 @@ console.log(response)
      {showModal && submittedData && (
        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"> 
        <div className="bg-white w-full max-w-lg rounded-xl shadow-2xl"> {/* Modal Header */} 
-        <div className="border-b px-6 py-4"> 
+        <div className="px-6 py-4"> 
           <h2 className="text-xl font-bold text-green-700"> Account Saved Successfully </h2>
            <p className="text-gray-500 text-sm mt-1"> Submitted employee account details </p>
-            </div> {/* Modal Body */} <div className="px-6 py-5 space-y-4"> {/* MIS */} 
-              <div className="flex justify-between border-b pb-3"> 
+            </div>
+             {/* Modal Body */} 
+             <div className="px-6 py-5 space-y-4"> {/* MIS */} 
+              <div className="flex justify-between "> 
                 <span className="font-medium text-gray-600"> MIS </span> 
                 <span className="font-semibold text-gray-900"> {submittedData.mis} </span> 
-                </div> {/* Account Number */}
-                 <div className="flex justify-between border-b pb-3">
+                </div> 
+                {/* Account Number */}
+                 <div className="flex justify-between ">
                    <span className="font-medium text-gray-600"> Account Number </span> 
                    <span className="font-semibold text-gray-900 break-all text-right"> {submittedData.AccountNo} </span>
-                    </div> {/* Account Holder */} 
-                    <div className="flex justify-between border-b pb-3">
+                    </div> 
+                    {/* Account Holder */} 
+                    <div className="flex justify-between ">
                        <span className="font-medium text-gray-600"> Account Holder Name </span>
                         <span className="font-semibold text-gray-900"> {submittedData.AccountHolderName} </span> 
-                        </div> {/* Contact Number */} <div className="flex justify-between border-b pb-3"> 
+                        </div> 
+                        {/* Contact Number */} 
+                        <div className="flex justify-between "> 
                           <span className="font-medium text-gray-600"> Contact Number </span>
                            <span className="font-semibold text-gray-900"> {submittedData.ContactNO} </span> 
-                           </div> {/* Work Location */} <div className="flex justify-between"> 
+                           </div> 
+                           {/* Work Location */}
+                            <div className="flex justify-between "> 
                             <span className="font-medium text-gray-600"> Work Location </span> 
                             <span className="font-semibold text-gray-900"> {submittedData.workLocation} </span>
-                            <span className="font-medium text-gray-600"> Bank Name </span> 
-                            <span className="font-semibold text-gray-900"> {submittedData.BankName} </span>
                              </div> 
+                             {/* Bank Name */}
+                               <div className="flex justify-between "> 
+                                <span className="font-medium text-gray-600"> Bank Name </span> 
+                            <span className="font-semibold text-gray-900"> {submittedData.BankName} </span>
+                            </div>
                              </div> {/* Modal Footer */}
-                              <div className="border-t px-6 py-4 flex justify-end"> 
+                              <div className=" px-6 py-4 flex justify-end"> 
                                 <button
                                  type="button" 
                                  onClick={() => { setShowModal(false); setSubmittedData(null); }}
@@ -272,17 +289,17 @@ console.log(response)
   className="w-full border rounded-lg px-4 py-3 bg-white outline-none transition duration-300 hover:bg-green-100 focus:ring-2 focus:ring-green-500"
 >
   <option value="">Select Bank Name</option>
-  <option value="Riyadh">Al-Rajhi</option>
-  <option value="Jeddah">AlBilad Bank</option>
-  <option value="Jeddah">Allnma Bank </option>
-  <option value="Jeddah">Arab National Bank</option>
-  <option value="Jeddah">Bank AlJazira</option>
-  <option value="Jeddah">Banque Saudi Fransi</option>
-  <option value="Jeddah">Emirates Bank</option>
-  <option value="Jeddah">Gulf International Bank</option>
-  <option value="Jeddah">Riyadh Bank</option>
-  <option value="Jeddah">STC Bank</option>
-  <option value="Jeddah">Saudi Awwal Bank</option>
+  <option value="Al-Rajhi">Al-Rajhi</option>
+  <option value="AlBilad Bank">AlBilad Bank</option>
+  <option value="Allnma Bank ">Allnma Bank </option>
+  <option value="Arab National Bank">Arab National Bank</option>
+  <option value="Bank AlJazira">Bank AlJazira</option>
+  <option value="Banque Saudi Fransi">Banque Saudi Fransi</option>
+  <option value="Emirates Bank">Emirates Bank</option>
+  <option value="Gulf International Bank">Gulf International Bank</option>
+  <option value="Riyadh Bank">Riyadh Bank</option>
+  <option value="STC Bank">STC Bank</option>
+  <option value="Saudi Awwal Bank">Saudi Awwal Bank</option>
  
 
 
