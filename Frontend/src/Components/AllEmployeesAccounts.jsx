@@ -7,6 +7,7 @@ export default function AllEmployeesAccounts() {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
+  const serverUrl = 'https://employeesmanagementsystem-1.onrender.com'
 
     const downloadExcel = () => {
     const excelData = accounts.map((accounts, index) => ({
@@ -68,7 +69,7 @@ export default function AllEmployeesAccounts() {
 
   try {
     const response = await axios.delete(
-      `http://localhost:5000/api/employees/account/${id}`
+      `${serverUrl}/api/employees/account/${id}`
     );
 
     
@@ -187,7 +188,7 @@ export default function AllEmployeesAccounts() {
                <td className="px-4 py-3 text-center">
   {account.accountImage && (
     <img
-      src={`http://localhost:5000/images/accounts/${account.accountImage}`}
+      src={`${serverUrl}/images/accounts/${account.accountImage}`}
       alt="Account"
       onClick={() => setSelectedImage(account.accountImage)}
       className="w-16 h-16 object-cover rounded-lg border cursor-pointer hover:opacity-80 transition"
