@@ -31,6 +31,11 @@ const Account = new mongoose.Schema(
       type: String,
       required: [true, 'Work Location is required'],
     },
+
+     accountImage: {
+      type: String,
+      required: [true, 'Account Image is required'],
+    },
    
   },
   {
@@ -40,6 +45,6 @@ const Account = new mongoose.Schema(
 
 
 
-const AccountSchema = mongoose.models.Account || mongoose.model("Account", Account);
+const AccountSchema = mongoose.models.account || mongoose.model("account", Account);
 
 export default AccountSchema;

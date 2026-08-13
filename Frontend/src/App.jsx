@@ -8,16 +8,12 @@ import './App.css'
 // import AllEmployeesData from './Components/AllEmployeesData'
 // import AccountDetails from './Components/AccountDetails'
 import AppRoutes from './routes/AppRoutes'
-import { ToastContainer } from 'react-toastify';
+
 
 function App() {
   
   return <AppRoutes />;
-   <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        theme="colored"
-      />
+
 }
 
 export default App;

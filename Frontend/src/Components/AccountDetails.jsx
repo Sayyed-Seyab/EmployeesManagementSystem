@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
+import tesseract from "tesseract.js"
 
 export default function AccountDetails() {
   const [formData, setFormData] = useState({
@@ -19,6 +20,8 @@ export default function AccountDetails() {
   const [showModal, setShowModal] = useState(false);
   //loader
   const [loading, setLoading] = useState(false);
+  const [accountImage, setAccountImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   // Handle Input Change
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -86,13 +89,49 @@ export default function AccountDetails() {
     return toast.error(
       "Enter a valid Saudi mobile number (e.g. 05XXXXXXXX)."
     );
+
+
+  // Account image
+  if (!accountImage) {
+    return toast.error("Account image is required.");
+  }
   
 
   try {
      setLoading(true);
+       // Create FormData
+    const formDataToSend = new FormData();
+
+    formDataToSend.append("mis", formData.mis);
+    formDataToSend.append(
+      "AccountNo",
+      `SA${formData.AccountNo}`
+    );
+    formDataToSend.append(
+      "AccountHolderName",
+      formData.AccountHolderName
+    );
+    formDataToSend.append(
+      "ContactNO",
+      formData.ContactNO
+    );
+    formDataToSend.append(
+      "workLocation",
+      formData.workLocation
+    );
+    formDataToSend.append(
+      "BankName",
+      formData.BankName
+    );
+
+    // IMPORTANT
+    formDataToSend.append(
+      "accountImage",
+      accountImage
+    );
    const response =  await axios.post(
       "https://employeesmanagementsystem-1.onrender.com/api/employees/account",
-      payload
+      formDataToSend
     );
 console.log(response)
     if(response.status === 201) {
@@ -103,6 +142,8 @@ console.log(response)
       setSubmittedData(payload);
        // Show success modal 
        setShowModal(true);
+       setAccountImage(null);
+       setImagePreview(null);
        setFormData({
       mis: "",
       AccountNo: "",
@@ -111,6 +152,7 @@ console.log(response)
       workLocation:"",
       BankName:"",
     });
+
     }
 
    
@@ -124,6 +166,151 @@ console.log(response)
   }finally {
   setLoading(false);
 }
+};
+
+const extractAccountData = (text) => {
+  const normalizedText = text
+    .replace(/\r/g, "\n")
+    .replace(/[|[\]]/g, " ")
+    .replace(/\n+/g, "\n")
+    .trim();
+
+  const lines = normalizedText
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  // =========================
+  // FIND IBAN
+  // =========================
+
+  const ibanMatch = normalizedText.match(
+    /\bSA\d{2}(?:\s*\d{4}){5}\b/gi
+  );
+
+  let accountNo = "";
+
+  if (ibanMatch) {
+    accountNo = ibanMatch[0]
+      .replace(/\s+/g, "")
+      .toUpperCase()
+      .replace(/^SA/, "");
+  }
+
+  // =========================
+  // FIND ACCOUNT HOLDER
+  // =========================
+
+  let accountHolderName = "";
+
+  const ignoredWords = [
+    "account",
+    "number",
+    "iban",
+    "bank",
+    "branch",
+    "address",
+    "date",
+    "arab",
+    "national",
+    "snb",
+    "alahli",
+    "al ahli",
+  ];
+
+  const candidates = lines
+    .map((line, index) => {
+      const cleaned = line
+        .replace(/[^A-Za-z\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      const words = cleaned.split(" ");
+
+      // Ignore short OCR garbage like "BSS og"
+      if (words.length < 3) {
+        return null;
+      }
+
+      const containsIgnoredWord = ignoredWords.some((word) =>
+        cleaned.toLowerCase().includes(word)
+      );
+
+      if (containsIgnoredWord) {
+        return null;
+      }
+
+      const onlyLetters = words.every((word) =>
+        /^[A-Za-z]+$/.test(word)
+      );
+
+      if (!onlyLetters) {
+        return null;
+      }
+
+      if (words.length > 7) {
+        return null;
+      }
+
+      return {
+        name: cleaned,
+        index,
+      };
+    })
+    .filter(Boolean);
+
+  // Prefer name immediately before Account Number
+  const accountNumberIndex = lines.findIndex((line) =>
+    /account\s*number/i.test(line)
+  );
+
+  if (accountNumberIndex !== -1) {
+    const beforeAccountNumber = candidates
+      .filter((candidate) => candidate.index < accountNumberIndex)
+      .sort((a, b) => b.index - a.index);
+
+    if (beforeAccountNumber.length > 0) {
+      accountHolderName = beforeAccountNumber[0].name;
+    }
+  }
+
+  // Fallback
+  if (!accountHolderName && candidates.length > 0) {
+    accountHolderName = candidates[0].name;
+  }
+
+  return {
+    accountNo,
+    accountHolderName,
+  };
+};
+
+const GetImageData = (file) => {
+  console.log(file);
+
+  tesseract
+    .recognize(file, "eng", {
+      logger: (m) => console.log(m),
+    })
+    .then(({ data: { text } }) => {
+      console.log("========== OCR TEXT ==========");
+      console.log(text);
+
+      const data = extractAccountData(text);
+
+      console.log("========== EXTRACTED DATA ==========");
+      console.log(data);
+
+      setFormData((prev) => ({
+        ...prev,
+        AccountNo: data.accountNo || prev.AccountNo,
+        AccountHolderName:
+          data.accountHolderName || prev.AccountHolderName,
+      }));
+    })
+    .catch((error) => {
+      console.error("OCR Error:", error);
+    });
 };
 
   return (
@@ -184,6 +371,58 @@ console.log(response)
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+  <div className="mb-4">
+  <label className="block mb-2 font-medium">
+    Account Image
+  </label>
+
+  {/* Hidden file input */}
+  <input
+    id="accountImage"
+    type="file"
+    accept="image/png,image/jpeg,image/jpg,image/webp"
+    className="hidden"
+    onChange={async(e) => {
+      const file = e.target.files[0];
+
+      if (!file) return;
+
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image size must be less than 5MB.");
+        e.target.value = "";
+        setAccountImage(null);
+        setImagePreview(null);
+        return;
+      }
+
+      setAccountImage(file);
+
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+      GetImageData(file)
+      
+    }}
+  />
+
+  {/* Green Upload Button */}
+  <label
+    htmlFor="accountImage"
+    className="inline-block bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2.5 rounded-lg cursor-pointer transition"
+  >
+    Upload Account Image
+  </label>
+
+  {/* Image Preview */}
+  {imagePreview && (
+    <div className="mt-4">
+      <img
+        src={imagePreview}
+        alt="Account Preview"
+         className="max-w-full max-h-[90vh] object-contain rounded-lg "
+      />
+    </div>
+  )}
+</div>
 
           {/* MIS */}
           <div>

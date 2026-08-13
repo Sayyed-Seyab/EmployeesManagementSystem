@@ -1,5 +1,7 @@
 import AccountSchema from '../models/Account.js';
 import EmployeesSchema from '../models/Employee.js';
+import fs from "fs/promises";
+import path from 'path';
 
 export const getEmployees = async (req, res) => {
   try {
@@ -178,15 +180,51 @@ export const deleteEmployee = async (req, res) => {
 
 export const dltAccount = async (req, res) => {
   try {
-    const Account = await AccountSchema.findByIdAndDelete(req.params.id);
+    // First find the account
+    const Account = await AccountSchema.findById(req.params.id);
 
     if (!Account) {
-      return res.status(404).json({ success: false, message: 'Account not found' });
+      return res.status(404).json({
+        success: false,
+        message: "Account not found",
+      });
     }
 
-    res.status(200).json({ success: true, message: 'Account deleted successfully' });
+    console.log("Image from DB:", Account.accountImage);
+
+    // Create absolute image path
+    const imagePath = path.join(
+      process.cwd(),
+      "Uploads",
+      "accounts",
+      Account.accountImage
+    );
+
+    console.log("Image path:", imagePath);
+
+    // Delete image first
+    try {
+      await fs.unlink(imagePath);
+      console.log("Image deleted successfully");
+    } catch (error) {
+      console.error("Image deletion error:", error.message);
+    }
+
+    // Delete account from MongoDB
+    await AccountSchema.findByIdAndDelete(req.params.id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Account and image deleted successfully",
+    });
+
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
@@ -202,7 +240,8 @@ export const createAccount = async (req, res) => {
       workLocation,
       BankName,
     } = req.body;
-
+console.log(req.body)
+console.log(req.file.filename)
     // Validation
     if (!mis || !AccountNo || !AccountHolderName || !ContactNO || !workLocation || !BankName) {
       return res.status(400).json({
@@ -234,6 +273,7 @@ export const createAccount = async (req, res) => {
         message: "Contact No already exists.",
       });
     }
+     
 
     // Create Account
     const account = await AccountSchema.create({
@@ -243,6 +283,7 @@ export const createAccount = async (req, res) => {
       ContactNO,
       BankName,
       workLocation,
+      accountImage: req.file ? req.file.filename : "Account Image required",
     });
 
     return res.status(201).json({

@@ -6,6 +6,7 @@ import * as XLSX from "xlsx";
 export default function AllEmployeesAccounts() {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState(null);
 
     const downloadExcel = () => {
     const excelData = accounts.map((accounts, index) => ({
@@ -67,7 +68,7 @@ export default function AllEmployeesAccounts() {
 
   try {
     const response = await axios.delete(
-      `https://employeesmanagementsystem-1.onrender.com/api/employees/account/${id}`
+      `http://localhost:5000/api/employees/account/${id}`
     );
 
     
@@ -106,6 +107,32 @@ export default function AllEmployeesAccounts() {
 
  return (
   <div className="p-6">
+    {selectedImage && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+    onClick={() => setSelectedImage(null)}
+  >
+    <div
+      className="relative max-w-4xl max-h-[90vh]"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* Close button */}
+      <button
+        onClick={() => setSelectedImage(null)}
+        className="absolute -top-4 -right-4 w-10 h-10 rounded-full bg-red-600 text-white text-xl font-bold hover:bg-red-700"
+      >
+        ×
+      </button>
+
+      {/* Full image */}
+      <img
+        src={`https://employeesmanagementsystem-1.onrender.com/images/accounts/${selectedImage}`}
+        alt="Account Full Size"
+        className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+      />
+    </div>
+  </div>
+)}
 
      {/* Header */}
   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 border-b bg-gray-50">
@@ -131,11 +158,13 @@ export default function AllEmployeesAccounts() {
         <thead className="sticky top-0 z-20 bg-green-700 text-white">
           <tr>
             <th className="px-4 py-3 rounded-tl-xl">S.NO</th>
+             <th className="px-4 py-3">Image</th>
             <th className="px-4 py-3">MIS</th>
             <th className="px-4 py-3">Account Number</th>
             <th className="px-4 py-3">Account Holder Name</th>
             <th className="px-4 py-3">Bank Name</th>
              <th className="px-4 py-3">Contact Number</th>
+             <th className="px-4 py-3">Work Location</th>
             <th className="px-4 py-3 ">Created At</th>
             <th className="px-4 py-3 text-center rounded-tr-xl">
   Action
@@ -155,6 +184,17 @@ export default function AllEmployeesAccounts() {
                   {index + 1}
                 </td>
 
+               <td className="px-4 py-3 text-center">
+  {account.accountImage && (
+    <img
+      src={`http://localhost:5000/images/accounts/${account.accountImage}`}
+      alt="Account"
+      onClick={() => setSelectedImage(account.accountImage)}
+      className="w-16 h-16 object-cover rounded-lg border cursor-pointer hover:opacity-80 transition"
+    />
+  )}
+</td>
+
                 <td className="px-4 py-3 text-center">
                   {account.mis}
                 </td>
@@ -172,6 +212,10 @@ export default function AllEmployeesAccounts() {
 
                 <td className="px-4 py-3 text-center">
                   {account.ContactNO}
+                </td>
+
+                <td className="px-4 py-3 text-center">
+                  {account.workLocation}
                 </td>
 
                 <td className="px-4 py-3 text-center">
