@@ -547,7 +547,7 @@ const GetImageData = (file) => {
   <option value="Riyadh Bank">Riyadh Bank</option>
   <option value="STC Bank">STC Bank</option>
   <option value="SAB">Saudi Awwal Bank</option>
-  <option value="SNB">Saudi Awwal Bank</option>
+  <option value="SNB">Saudi National Bank</option>
  
 
 
