@@ -539,14 +539,15 @@ const GetImageData = (file) => {
   <option value="Al-Rajhi">Al-Rajhi</option>
   <option value="AlBilad Bank">AlBilad Bank</option>
   <option value="Allnma Bank ">Allnma Bank </option>
-  <option value="Arab National Bank">Arab National Bank</option>
+  <option value="ANB">Arab National Bank</option>
   <option value="Bank AlJazira">Bank AlJazira</option>
   <option value="Banque Saudi Fransi">Banque Saudi Fransi</option>
   <option value="Emirates Bank">Emirates Bank</option>
-  <option value="Gulf International Bank">Gulf International Bank</option>
+  <option value="GIB">Gulf International Bank</option>
   <option value="Riyadh Bank">Riyadh Bank</option>
   <option value="STC Bank">STC Bank</option>
-  <option value="Saudi Awwal Bank">Saudi Awwal Bank</option>
+  <option value="SAB">Saudi Awwal Bank</option>
+  <option value="SNB">Saudi Awwal Bank</option>
  
 
 
