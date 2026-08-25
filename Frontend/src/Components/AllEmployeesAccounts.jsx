@@ -188,7 +188,7 @@ export default function AllEmployeesAccounts() {
                <td className="px-4 py-3 text-center">
   {account.accountImage && (
     <img
-      src={`${serverUrl}/images/accounts/${account.accountImage}`}
+      src={account.accountImage}
       alt="Account"
       onClick={() => setSelectedImage(account.accountImage)}
       className="w-16 h-16 object-cover rounded-lg border cursor-pointer hover:opacity-80 transition"
