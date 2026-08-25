@@ -127,7 +127,7 @@ export default function AllEmployeesAccounts() {
 
       {/* Full image */}
       <img
-        src={`https://employeesmanagementsystem-1.onrender.com/images/accounts/${selectedImage}`}
+        src={selectedImage}
         alt="Account Full Size"
         className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
       />
