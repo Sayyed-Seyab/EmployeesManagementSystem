@@ -1,3 +1,4 @@
+import cloudinary from '../config/Cludinary.js';
 import AccountSchema from '../models/Account.js';
 import EmployeesSchema from '../models/Employee.js';
 import fs from "fs/promises";
@@ -181,33 +182,18 @@ export const deleteEmployee = async (req, res) => {
 export const dltAccount = async (req, res) => {
   try {
     // First find the account
-    const Account = await AccountSchema.findById(req.params.id);
+    const account = await AccountSchema.findById(req.params.id);
 
-    if (!Account) {
+    if (!account) {
       return res.status(404).json({
         success: false,
-        message: "Account not found",
+        message: "Account not found.",
       });
     }
 
-    console.log("Image from DB:", Account.accountImage);
-
-    // Create absolute image path
-    const imagePath = path.join(
-      process.cwd(),
-      "Uploads",
-      "accounts",
-      Account.accountImage
-    );
-
-    console.log("Image path:", imagePath);
-
-    // Delete image first
-    try {
-      await fs.unlink(imagePath);
-      console.log("Image deleted successfully");
-    } catch (error) {
-      console.error("Image deletion error:", error.message);
+    // Delete image from Cloudinary
+    if (account.cloudinaryPublicId) {
+      await cloudinary.uploader.destroy(account.cloudinaryPublicId);
     }
 
     // Delete account from MongoDB
@@ -249,6 +235,13 @@ console.log(req.file.filename)
         message: "All fields are required.",
       });
     }
+    // Check image
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Account image is required.",
+      });
+    }
 
      const existingMIS = await AccountSchema.findOne({
       mis,
@@ -273,6 +266,27 @@ console.log(req.file.filename)
         message: "Contact No already exists.",
       });
     }
+
+    // Upload image to Cloudinary
+    const uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: "employees/accounts",
+        },
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+
+      uploadStream.end(req.file.buffer);
+    });
+
+    console.log("Cloudinary result:", uploadResult);
+    console.log("Cloudinary URL:", uploadResult.secure_url);
      
 
     // Create Account
@@ -283,7 +297,11 @@ console.log(req.file.filename)
       ContactNO,
       BankName,
       workLocation,
-      accountImage: req.file ? req.file.filename : "Account Image required",
+      // Cloudinary image URL
+      accountImage: uploadResult.secure_url,
+
+      // Save this so you can delete the image later
+      cloudinaryPublicId: uploadResult.public_id,
     });
 
     return res.status(201).json({

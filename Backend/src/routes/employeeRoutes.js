@@ -15,15 +15,31 @@ import {
 const EmployeeRouter = express.Router();
 
 //Image storege engine
-const AccountStorage = multer.diskStorage({
-    destination: 'Uploads/accounts',
-    filename:(req, file, cb)=>{
-        const sanitizedFileName = file.originalname.replace(/\s+/g, "-"); // Replace spaces with dashes
-        cb(null, `${Date.now()}-${sanitizedFileName}`);
+// const AccountStorage = multer.diskStorage({
+//     destination: 'Uploads/accounts',
+//     filename:(req, file, cb)=>{
+//         const sanitizedFileName = file.originalname.replace(/\s+/g, "-"); // Replace spaces with dashes
+//         cb(null, `${Date.now()}-${sanitizedFileName}`);
       
+//     }
+// })
+// const Upload = multer({storage: AccountStorage})
+
+const Upload = multer({
+  storage: multer.memoryStorage(),
+
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image files are allowed"));
     }
-})
-const Upload = multer({storage: AccountStorage})
+  },
+});
 
 
 EmployeeRouter.post('/account', Upload.single('accountImage'), createAccount);

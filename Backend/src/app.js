@@ -13,6 +13,7 @@ const allowedOrigins = [
   "https://employees-management-system-65e3.vercel.app",
 ];
 
+
 app.use(
   cors({
     origin: (origin, callback) => {

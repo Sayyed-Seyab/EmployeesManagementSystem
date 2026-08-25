@@ -36,6 +36,9 @@ const Account = new mongoose.Schema(
       type: String,
       required: [true, 'Account Image is required'],
     },
+    cloudinaryPublicId: {
+      type: String,
+    },
    
   },
   {
