@@ -510,7 +510,7 @@ const GetImageData = (file) => {
     Work Location
   </label>
 
-//locations
+
   <select
   name="workLocation"
   value={formData.workLocation}
