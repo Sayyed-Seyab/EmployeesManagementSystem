@@ -510,6 +510,7 @@ const GetImageData = (file) => {
     Work Location
   </label>
 
+//locations
   <select
   name="workLocation"
   value={formData.workLocation}
@@ -519,8 +520,8 @@ const GetImageData = (file) => {
   <option value="">Select Work Location</option>
   <option value="Riyadh">Riyadh</option>
   <option value="Jeddah">Jeddah</option>
-    <option value="China Harbor">China Harbor
-    </option>
+    <option value="China Harbor">China Harbor</option>
+    <option value="Damman">Damman</option>
 </select>
 </div>
 
