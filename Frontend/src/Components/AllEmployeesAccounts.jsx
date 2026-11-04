@@ -172,7 +172,7 @@ export default function AllEmployeesAccounts() {
         <div className="flex flex-col sm:flex-row gap-3">
 
           {/* Location Dropdown */}
-          //filter location wise
+           {/* filter location wise */}
           <select
             value={selectedLocation}
             onChange={(e) =>
